@@ -1,9 +1,20 @@
-# Full credit to the tutorial below for helping me get started!
+#!/usr/bin/python
+# Cheerbot main code
+# Author - Edward White
+# Date - 23/10/2015
+# -----------------------------------------------------------------------------
+# ToDo
+# Move strings into a separate file, with relevant functions
+# Create reddit scraper
+# Create script logger for debugging!
+# Create functions to store and manage data from reddit
+# Improve reply generation function (keywords, minimise local duplicates, etc)
+# -----------------------------------------------------------------------------
+# Full credit to the tutorial below for helping me get started with tweepy!
 # http://videlais.com/2015/03/02/how-to-create-a-basic-twitterbot-in-python/
-# List of free Python PaaS sites
-# https://wiki.python.org/moin/FreeHosts
 
 import tweepy
+import praw
 from keys import consumer_key,consumer_secret,access_token,access_token_secret
 
 class TwitterAPI:
@@ -21,11 +32,7 @@ class TwitterAPI:
 
 	def get_mentions(self):
 		last_tweet = self.api.me().status.id
-		mentions = self.api.mention_timeline(since_id=last_tweet)
-		for mention in mentions:
-			#print(mention.user.screen_name)
-			#print(mention.text)
-		return mentions
+		return self.api.mentions_timeline(since_id=last_tweet)
 
 	def get_my_username(self):
 		return self.api.auth.get_username()
@@ -37,12 +44,12 @@ def get_users_mentioned(text):
 	users=[]
 	for word in text.split():
 		if word.startswith('@'):
-			users.append(word[1:])
+			users.append(word[1:]) # remove leading @ symbol
 	return users
 
 def new_user_mentioned(api, mention):
 	users = get_users_mentioned(mention.text)
-	users.remove(api.get_my_username())
+	users.remove(api.get_my_username()) # mentions must contain bots username, so remove
 	if not users:
 		return False
 	else:
@@ -56,7 +63,8 @@ def in_reply_to_user(username, mention):
 
 def create_reply_string(api, mention):
 	# Potential case. User tweets @ both cheer bot and someone-else.
-	# The other person may reply, which would involve a mention to cheerbot (but status not a reply to cheerbot). Should be treated differently!
+	# The other person may reply, which would involve a mention to cheerbot 
+	# (but status not a reply to cheerbot). Should be treated differently!
 	string = ""
 	if mention.in_reply_to_screen_name == None:
 		if new_user_mentioned(api, mention):
@@ -74,9 +82,21 @@ def create_reply_string(api, mention):
 	return string
 
 if __name__ == "__main__":
+	# Reddit stuff
+	user_agent = ("CheerMeUp Scraper v0.1")
+	r = praw.Reddit(user_agent = user_agent)
+
+	subreddit = r.get_subreddit("aww")
+
+	for submission in subreddit.get_hot(limit = 25):
+		print("Title: ", submission.title)
+		print("Text: ", submission.url)
+		print("Score: ", submission.score)
+		print("---------------------------------\n")
+		
+	# Twitter stuff
 	twitter = TwitterAPI()
 	mentions = twitter.get_mentions()
 	for mention in mentions:
 		reply_str = create_reply_string(twitter, mention)
-		#print(reply_str)
-		#twitter.reply(mention.id, mention.user.screen_name, reply_str)
+		twitter.reply(mention.id, mention.user.screen_name, reply_str)
