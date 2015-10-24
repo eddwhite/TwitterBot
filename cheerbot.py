@@ -5,7 +5,6 @@
 # -----------------------------------------------------------------------------
 # ToDo
 # Move strings into a separate file, with relevant functions
-# Create reddit scraper
 # Create script logger for debugging!
 # Create functions to store and manage data from reddit
 # Improve reply generation function (keywords, minimise local duplicates, etc)
@@ -13,9 +12,25 @@
 # Full credit to the tutorial below for helping me get started with tweepy!
 # http://videlais.com/2015/03/02/how-to-create-a-basic-twitterbot-in-python/
 
-import tweepy
-import praw
+import tweepy, praw, json
 from keys import consumer_key,consumer_secret,access_token,access_token_secret
+
+class LinkStore:
+	def __init__(self):
+		# open a JSON file if it exists
+		# load objects into list
+			# title, link, date last used, reddit id
+			# object = {'title': , 'link':, 'last_used':, 'id': }
+			# object['title'] = 
+		# if no file exists, create one and make empty list
+
+	def add(self, ):
+		# add a link to set if not a duplicate
+		# add to file
+
+	def get(self, keyword):
+		# get a fresh link based on keyword (if provided)
+		# update file
 
 class TwitterAPI:
 	def __init__(self):
