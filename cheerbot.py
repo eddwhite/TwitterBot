@@ -7,7 +7,7 @@
 # Move strings into a separate file, with relevant functions
 # Create script logger for debugging!
 # Create functions to store and manage data from reddit
-# Improve reply generation function (keywords, minimise local duplicates, etc)
+# Improve reply generation function (keywords, minimise similar tweets, etc)
 # -----------------------------------------------------------------------------
 # Full credit to the tutorial below for helping me get started with tweepy!
 # http://videlais.com/2015/03/02/how-to-create-a-basic-twitterbot-in-python/
@@ -16,21 +16,47 @@ import tweepy, praw, json
 from keys import consumer_key,consumer_secret,access_token,access_token_secret
 
 class LinkStore:
+	posts = [['cat'], ['dog', 'labrador']]
+	animals = []
 	def __init__(self):
 		# open a JSON file if it exists
-		# load objects into list
+		# load dict into list
 			# title, link, date last used, reddit id
-			# object = {'title': , 'link':, 'last_used':, 'id': }
-			# object['title'] = 
+			# dict = {'title': , 'link':, 'last_used':, 'id': }
+			# dict['title'] =
 		# if no file exists, create one and make empty list
 
-	def add(self, ):
-		# add a link to set if not a duplicate
-		# add to file
+	def add(self, post):
+		# separate file extension from url
+		post['url'], post['ext'] = os.path.splitext(post['url'])
+		url_parts = post['url'].split('/')
+		# Check url is a valid, non gallery/album imgur
+		if not(('i.imgur.com' in url_parts) or ('imgur.com' in url_parts)):
+			return
+		if 'a' in url_parts or 'gallery' in url_parts:
+			return
+		# Only store the 7 digit ID at the end of the link
+		post['url'] = [part for part in url_parts if len(part)==7].pop()
+		# make sure post would fit in a tweet (10 for imgur link and space)
+		if len(post['url']+post['title']) + 11 > 140:
+			return
+		post['last_used'] = 0
+		post['animal'] = []
+		# check for references to animals(s) in the image
+		for word in post['title'].split():
+			for species in animals:
+				if word.lower() in species:
+					post['animal'].append(species[0])
+		# check link is not already in database
+		posts.append(post)
 
-	def get(self, keyword):
+	def get(self, animals):
 		# get a fresh link based on keyword (if provided)
-		# update file
+
+	def flush(self):
+
+	def close(self):
+
 
 class TwitterAPI:
 	def __init__(self):
@@ -78,7 +104,7 @@ def in_reply_to_user(username, mention):
 
 def create_reply_string(api, mention):
 	# Potential case. User tweets @ both cheer bot and someone-else.
-	# The other person may reply, which would involve a mention to cheerbot 
+	# The other person may reply, which would involve a mention to cheerbot
 	# (but status not a reply to cheerbot). Should be treated differently!
 	string = ""
 	if mention.in_reply_to_screen_name == None:
@@ -97,18 +123,16 @@ def create_reply_string(api, mention):
 	return string
 
 if __name__ == "__main__":
+	posts = LinkStore() # Database initialisation
 	# Reddit stuff
 	user_agent = ("CheerMeUp Scraper v0.1")
 	r = praw.Reddit(user_agent = user_agent)
 
-	subreddit = r.get_subreddit("aww")
+	subreddit = r.get_subreddit("aww") # lolcats and awwgifs also could be good
 
-	for submission in subreddit.get_hot(limit = 25):
-		print("Title: ", submission.title)
-		print("Text: ", submission.url)
-		print("Score: ", submission.score)
-		print("---------------------------------\n")
-		
+	for submission in subreddit.get_hot(limit = 25): # also get top!
+		posts.add({'title': submission.title, 'url': submission.url})
+
 	# Twitter stuff
 	twitter = TwitterAPI()
 	mentions = twitter.get_mentions()
