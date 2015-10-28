@@ -6,11 +6,10 @@
 # This handles the storage of all reddit posts, along with adding new posts to
 # the database
 
-import json, os
+import json, os, re
+import praw # for testing
 
 class PostStore:
-	posts = []
-	animals = [[]]
 	def __init__(self):
 		# Create/open post database
 		if not os.path.exists('post_database.txt'):
@@ -18,10 +17,10 @@ class PostStore:
 			json.dump([], fo)
 			fo.close()
 		with open('post_database.txt', 'r') as fi:
-			posts = json.load(fi)
+			self.posts = json.load(fi)
 		# Open animal database
 		with open('animal_database.txt', 'r') as fi:
-			animals = json.load(fi)
+			self.animals = json.load(fi)
 
 	def add(self, post):
 		# separate file extension from url
@@ -40,18 +39,32 @@ class PostStore:
 		post['last_used'] = 0
 		post['animal'] = []
 		# check for references to animals(s) in the image
-		for word in post['title'].split():
-			for species in animals:
-				if word.lower() in species:
+		for word in re.findall('\w+', post['title']):
+			for species in self.animals:
+				if word.lower() in species: #plurals?!!??!
 					post['animal'].append(species[0])
 		# check link is not already in database
-		posts.append(post)
+		self.posts.append(post)
 
 	def get(self, text):
 		# create a fresh post based on text if possible
+		return
 
 	def flush(self):
 		with open('post_database.txt', 'w') as fo:
-			json.dump(posts, fo, indent = 4)
-		with open('post_database.txt', 'w') as fo:
-			json.dump(animals, fo, indent = 4)
+			json.dump(self.posts, fo, indent = 4)
+		with open('animal_database.txt', 'w') as fo:
+			json.dump(self.animals, fo, indent = 4)
+
+# use for testing
+if __name__ == "__main__":
+	posts = PostStore()
+	# Reddit stuff
+	user_agent = ("CheerMeUp Scraper v0.1")
+	r = praw.Reddit(user_agent = user_agent)
+
+	subreddit = r.get_subreddit("aww") # lolcats and awwgifs also could be good
+
+	for submission in subreddit.get_top(limit = 25): # also get top!
+		posts.add({'title': submission.title, 'url': submission.url})
+	posts.flush()

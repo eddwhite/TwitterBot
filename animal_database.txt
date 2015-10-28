@@ -1,12 +1,27 @@
 [
-  [
-    "dog",
-    "labrador",
-    "pug",
-    "shitzu"
-  ],
-  [
-    "cat",
-    "kitten"
-  ]
+    [
+        "dog",
+        "labrador",
+        "pug",
+        "shitzu",
+        "husky",
+        "samoyed",
+        "pup"
+    ],
+    [
+        "cat",
+        "kitten",
+        "kitty"
+    ],
+    [
+        "wolf",
+        "wolves"
+    ],
+    [
+        "penguin"
+    ],
+    [
+        "rabbit",
+        "bunny"
+    ]
 ]
