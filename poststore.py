@@ -6,7 +6,7 @@
 # This handles the storage of all reddit posts, along with adding new posts to
 # the database
 
-import json, os, re
+import json, os, re, time
 import praw # for testing
 
 class PostStore:
@@ -36,7 +36,7 @@ class PostStore:
 		# make sure post would fit in a tweet (10 for imgur link and space)
 		if len(post['url']+post['title']) + 11 > 140:
 			return
-		post['last_used'] = -1
+		post['last_used'] = 0
 		post['animal'] = []
 		# check for references to animals(s) in the image
 		for word in re.findall('\w+', post['title']):
@@ -57,9 +57,9 @@ class PostStore:
 				if word.lower() in species or word.lower()-'s' in species
 					keywords.add(species[0])
 		# return the post with the highest match that has the smallest last used
-		x = posts[0]
+		x = self.posts[0]
 		x_rating = 0
-		for post in posts:
+		for post in self.posts:
 			match_rating = len(keywords.intersection(post['animal']))
 			if match_rating > x_rating:
 				x = post
@@ -67,7 +67,8 @@ class PostStore:
 			elif match_rating == x_rating and post['last_used'] < x['last_used']:
 				x = post
 				x_rating = match_rating
-		# update last used in posts
+		# update last used (changing x will update database)
+		x['last_used'] = int(time.time())
 		return x
 
 	def flush(self):
