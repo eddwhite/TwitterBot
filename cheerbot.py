@@ -12,7 +12,7 @@
 # Full credit to the tutorial below for helping me get started with tweepy!
 # http://videlais.com/2015/03/02/how-to-create-a-basic-twitterbot-in-python/
 
-import tweepy, praw, poststore
+import tweepy, praw, poststore, time
 from keys import consumer_key,consumer_secret,access_token,access_token_secret
 
 class TwitterAPI:
@@ -24,9 +24,9 @@ class TwitterAPI:
 	def tweet(self, message):
 		self.api.update_status(status=message)
 
-	def reply(self, original_id, op_screen_name, message):
+	def reply(self, original_id, message):
 		self.api.update_status(in_reply_to_status_id=original_id,
-								status="@"+op_screen_name+" "+message)
+								status=message)
 
 	def get_mentions(self):
 		last_tweet = self.api.me().status.id
@@ -59,40 +59,45 @@ def in_reply_to_user(username, mention):
 	else:
 		return False
 
-def create_reply_string(api, mention):
+def create_reply_string(twitter, mention):
 	# Potential case. User tweets @ both cheer bot and someone-else.
 	# The other person may reply, which would involve a mention to cheerbot
 	# (but status not a reply to cheerbot). Should be treated differently!
 	string = ""
 	if mention.in_reply_to_screen_name == None:
-		if new_user_mentioned(api, mention):
-			string = "Thanks for spreading the word! Here's a cat (=^_^=)"
+		if new_user_mentioned(twitter, mention):
+			string = "Thanks for spreading the word!\n"
 		else:
-			string = "I'm not quite ready yet, but I'm sure my creator Edd will say when I'm done!"
+			string = "Here you go!\n"
 	else:
-		if in_reply_to_user(api.get_my_username(), mention):
-			if new_user_mentioned(api, mention):
-				string = "Thank You! Now more people can be cheered up ... CAT (=^_^=)"
+		if in_reply_to_user(twitter.get_my_username(), mention):
+			if new_user_mentioned(twitter, mention):
+				string = "Thank You! Now more people can be cheered up ...\n"
 			else:
-				string = "You can tweet at me all you like, I can't cheer you up quite yet!"
+				string = "Want more? I hope you like this one as well\n"
 		else:
-			string = "Woo, go word of mouth! Happiness for all"
+			string = "Woo, go word of mouth! Happiness for all\n"
 	return string
 
 if __name__ == "__main__":
-	posts = PostStore() # Database initialisation
-	# Reddit stuff
-	user_agent = ("CheerMeUp Scraper v0.1")
-	r = praw.Reddit(user_agent = user_agent)
+	# Database initialisation
+	posts = PostStore()
 
-	subreddit = r.get_subreddit("aww") # lolcats and awwgifs also could be good
-
-	for submission in subreddit.get_hot(limit = 25): # also get top!
-		posts.add({'title': submission.title, 'url': submission.url})
+	# Reddit stuff - only do every half hour
+	# so hacky!
+	cur_minute = time.localtime().tm_min
+	if cur_minute in [0, 1, 30, 31]:
+		user_agent = ("CheerMeUp Scraper v0.1")
+		r = praw.Reddit(user_agent = user_agent)
+		subreddit = r.get_subreddit("aww") # lolcats and awwgifs also could be good
+		for submission in subreddit.get_hot(limit = 50):
+			posts.add({'title': submission.title, 'url': submission.url})
 
 	# Twitter stuff
 	twitter = TwitterAPI()
 	mentions = twitter.get_mentions()
 	for mention in mentions:
-		reply_str = create_reply_string(twitter, mention)
-		twitter.reply(mention.id, mention.user.screen_name, reply_str)
+		reply_str = '@'+mention.user.screen_name+' '
+		reply_str += create_reply_string(twitter, mention)
+		reply_str += posts.get(re.sub(r'@\w+',r'',mention.text), 140-len(reply_str))
+		twitter.reply(mention.id, reply_str)
