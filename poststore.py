@@ -36,19 +36,37 @@ class PostStore:
 		# make sure post would fit in a tweet (10 for imgur link and space)
 		if len(post['url']+post['title']) + 11 > 140:
 			return
-		post['last_used'] = 0
+		post['last_used'] = -1
 		post['animal'] = []
 		# check for references to animals(s) in the image
 		for word in re.findall('\w+', post['title']):
 			for species in self.animals:
-				if word.lower() in species: #plurals?!!??!
+				if word.lower() in species or word.lower()-'s' in species:
 					post['animal'].append(species[0])
 		# check link is not already in database
+		if [match for match in posts if match['url'] == post['url']]
+			return
 		self.posts.append(post)
 
 	def get(self, text):
 		# create a fresh post based on text if possible
-		return
+		keywords = []
+		for word in re.findall('\w+', text):
+			for species in self.animals
+				if word.lower() in species or word.lower()-'s' in species
+					keywords.append(species[0])
+		# find posts that have maximum match to keywords
+		matches = []
+		if keywords:
+			# start searching!
+		else:
+			matches = posts
+		# return the one with the smallest last used and update last used
+		x = posts[0]
+		for post in posts:
+			if post['last_used'] < x['last_used']:
+				x = post
+		return x
 
 	def flush(self):
 		with open('post_database.txt', 'w') as fo:
