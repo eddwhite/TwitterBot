@@ -81,7 +81,7 @@ def create_reply_string(twitter, mention):
 
 if __name__ == "__main__":
 	# Database initialisation
-	posts = PostStore()
+	posts = poststore.PostStore()
 
 	# Reddit stuff - only do every half hour
 	# so hacky!
