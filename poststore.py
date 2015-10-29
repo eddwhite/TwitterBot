@@ -43,7 +43,7 @@ class PostStore:
 			for species in self.animals:
 				if word.lower() in species or word.lower().rstrip('s') in species:
 					post['animal'].append(species[0])
-				if word.lower() == 'reddit'
+				if word.lower() == 'reddit':
 					return
 		# check link is not already in database
 		if [match for match in self.posts if match['url'] == post['url']]:
