@@ -49,23 +49,25 @@ class PostStore:
 		self.posts.append(post)
 
 	def get(self, text):
-		# create a fresh post based on text if possible
-		keywords = []
+		# create a fresh post based on input text
+		# find all animal references in input text
+		keywords = set()
 		for word in re.findall('\w+', text):
 			for species in self.animals
 				if word.lower() in species or word.lower()-'s' in species
-					keywords.append(species[0])
-		# find posts that have maximum match to keywords
-		matches = []
-		if keywords:
-			# start searching!
-		else:
-			matches = posts
-		# return the one with the smallest last used and update last used
+					keywords.add(species[0])
+		# return the post with the highest match that has the smallest last used
 		x = posts[0]
+		x_rating = 0
 		for post in posts:
-			if post['last_used'] < x['last_used']:
+			match_rating = len(keywords.intersection(post['animal']))
+			if match_rating > x_rating:
 				x = post
+				x_rating = match_rating
+			elif match_rating == x_rating and post['last_used'] < x['last_used']:
+				x = post
+				x_rating = match_rating
+		# update last used in posts
 		return x
 
 	def flush(self):
