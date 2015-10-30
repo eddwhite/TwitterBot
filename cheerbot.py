@@ -101,3 +101,5 @@ if __name__ == "__main__":
 		reply_str += create_reply_string(twitter, mention)
 		reply_str += posts.get(re.sub(r'@\w+',r'',mention.text), 140-len(reply_str))
 		twitter.reply(mention.id, reply_str)
+	# Update database
+	posts.flush()
