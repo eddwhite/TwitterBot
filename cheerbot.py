@@ -12,7 +12,7 @@
 # Full credit to the tutorial below for helping me get started with tweepy!
 # http://videlais.com/2015/03/02/how-to-create-a-basic-twitterbot-in-python/
 
-import tweepy, praw, poststore, time
+import tweepy, praw, poststore, time, re
 from keys import consumer_key,consumer_secret,access_token,access_token_secret
 
 class TwitterAPI:
