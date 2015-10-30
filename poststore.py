@@ -62,7 +62,7 @@ class PostStore:
 		x = self.posts[0]
 		x_rating = 0
 		for post in self.posts:
-			if len(post['title']) + 21 <= max_str_len:
+			if len(post['title'])+21<=max_str_len and not post['ext'] in ['.gif','.gifv']:
 				match_rating = len(keywords.intersection(post['animal']))
 				if match_rating > x_rating:
 					x = post

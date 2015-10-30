@@ -1,64 +1,64 @@
 [
     [
-        "dog", 
-        "labrador", 
-        "lab", 
-        "pug", 
-        "shitzu", 
-        "husky", 
-        "huskies", 
-        "samoyed", 
-        "pup", 
-        "puppy", 
-        "bulldog", 
-        "greyhound", 
+        "dog",
+        "labrador",
+        "lab",
+        "pug",
+        "shitzu",
+        "husky",
+        "huskies",
+        "samoyed",
+        "pup",
+        "puppy",
+        "bulldog",
+        "greyhound",
         "beagle"
-    ], 
+    ],
     [
-        "cat", 
-        "kitten", 
-        "kitty", 
+        "cat",
+        "kitten",
+        "kitty",
         "tabby"
-    ], 
+    ],
     [
-        "wolf", 
+        "wolf",
         "wolves"
-    ], 
+    ],
     [
         "penguin"
-    ], 
+    ],
     [
-        "rabbit", 
+        "rabbit",
         "bunny"
-    ], 
+    ],
     [
         "hedgehog"
-    ], 
+    ],
     [
-        "cow", 
+        "cow",
         "calf"
-    ], 
+    ],
     [
-        "bear", 
+        "bear",
         "cub"
-    ], 
+    ],
     [
         "monkey"
-    ], 
+    ],
     [
         "tortoise"
-    ], 
+    ],
     [
         "fox"
-    ], 
+    ],
     [
         "squirrel"
-    ], 
+    ],
     [
         "turkey"
-    ], 
+    ],
     [
-        "leopard", 
+        "leopard",
         "ocelot"
     ]
 ]
