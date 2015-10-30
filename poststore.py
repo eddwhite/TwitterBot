@@ -62,7 +62,7 @@ class PostStore:
 		x = self.posts[0]
 		x_rating = 0
 		for post in self.posts:
-			if len(post['title']) + 20 <= max_str_len:
+			if len(post['title']) + 28 <= max_str_len:
 				match_rating = len(keywords.intersection(post['animal']))
 				if match_rating > x_rating:
 					x = post
@@ -73,7 +73,7 @@ class PostStore:
 		# update last used (changing x will update database)
 		x['last_used'] = int(time.time())
 		# create post string
-		string = '\"' + x['title'] + '\"\nimgur.com/' + x['url']
+		string = '\"' + x['title'] + '\"\nimgur.com/gallery/' + x['url']
 		return string
 
 	def flush(self):
